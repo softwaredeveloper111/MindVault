@@ -1,10 +1,13 @@
 import itemModel from "../models/item.model.js";
 import { generateEmbedding } from "./ai.service.js";
+import mongoose from "mongoose"
 
 export const semanticSearch = async (userId, query) => {
 
   // Step 1 — Query ka embedding banao
   const queryEmbedding = await generateEmbedding(query);
+
+ 
 
   // Agar embedding nahi bani toh search nahi hoga
   if (!queryEmbedding || queryEmbedding.length === 0) {
@@ -21,7 +24,7 @@ export const semanticSearch = async (userId, query) => {
         numCandidates: 100,          // 100 mein se check karo
         limit: 10,                   // Top 10 return karo
         filter: {
-          userId: userId             // Sirf apne items dhundho
+          userId: new mongoose.Types.ObjectId(userId) // Sirf apne items dhundho
         }
       }
     },

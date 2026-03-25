@@ -4,6 +4,7 @@ import morgan from "morgan";
 import errorHandler from "./middleware/errorHandler.js";
 import authRouter from "./routes/auth.route.js";
 import itemRouter from "./routes/item.route.js";
+import searchRouter from "./routes/search.route.js";
 import cookieParser from "cookie-parser";
 
 
@@ -32,6 +33,9 @@ app.use(express.static("public"));
 
 app.use("/api/auth", authRouter )
 app.use("/api/items", itemRouter)
+app.use("/api/search" ,searchRouter)
+
+
 
 
 
