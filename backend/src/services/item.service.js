@@ -32,7 +32,7 @@ export const createItem = async(userId,data)=>{
  
 
   await addTaggingJob(newItem._id.toString(), newItem.title, newItem.description);
-await addEmbeddingJob(newItem._id.toString(), newItem.title, newItem.description);
+  await addEmbeddingJob(newItem._id.toString(), newItem.title, newItem.description);
 
 
   return newItem;
@@ -118,6 +118,8 @@ export const updateItem = async (itemId, userId, data) => {
     { new: true, runValidators: true }
   ).select("-embedding");
 
+  if(!item) return null
+
   return item;
 };
 
@@ -142,7 +144,6 @@ export const deleteItem = async (itemId, userId) => {
 
  
   await highlightModel.deleteMany({ itemId });
-
   return item;
 };
 

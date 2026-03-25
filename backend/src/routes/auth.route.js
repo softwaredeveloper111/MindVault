@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { registerController ,loginController} from "../controllers/auth.controller.js"
-
+import { registerController ,loginController , getMeController , logoutController} from "../controllers/auth.controller.js"
+import identifyingUser from "../middleware/auth.middleware.js";
 
 
 
@@ -30,6 +30,37 @@ authRouter.post("/register", registerController)
  */
 
 authRouter.post("/login", loginController)
+
+
+
+
+
+
+
+/**
+ * @method   GET
+ * @route    /api/auth/me
+ * @description   Get logged in user details
+ */
+
+authRouter.get("/me", identifyingUser , getMeController)
+
+
+
+
+
+
+
+
+/**
+ * @method  POST
+ * @route   /api/auth/logout
+ * @description
+ * 
+ */
+
+authRouter.post("/logout", logoutController )
+
 
 
 

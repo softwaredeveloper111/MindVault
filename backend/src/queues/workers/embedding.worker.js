@@ -1,5 +1,5 @@
 import { Worker } from "bullmq";
-import redis from "../../config/redis.js";
+import {bullMQConnection} from "../../config/redis.js";
 import { generateEmbedding } from "../../services/ai.service.js";
 import itemModel from "../../models/item.model.js";
 
@@ -25,7 +25,7 @@ const embeddingWorker = new Worker(
 
     console.log(`Embedding done for item: ${itemId}, length: ${embedding.length}`);
   },
-  { connection: redis }
+  { connection: bullMQConnection }
 );
 
 // Error handling

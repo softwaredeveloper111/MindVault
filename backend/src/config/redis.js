@@ -10,6 +10,15 @@ const redis = new Redis({
 })
 
 
+export const bullMQConnection = {
+  host: process.env.REDIS_HOST,
+  port: process.env.REDIS_PORT,
+  password: process.env.REDIS_PASSWORD,
+   maxRetriesPerRequest: null, 
+};
+
+
+
 
 redis.on("connect",()=>{
   console.log("Redis connected");

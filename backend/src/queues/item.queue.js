@@ -1,10 +1,10 @@
 import { Queue } from "bullmq";
-import redis from "../config/redis.js";
+import {bullMQConnection} from "../config/redis.js";
 
 
 // Ek queue — saari jobs isi mein jayengi
 const itemQueue = new Queue("item-processing", {
-  connection: redis,
+  connection: bullMQConnection,
   defaultJobOptions: {
     attempts: 3,          // Fail hone pe 3 baar try karo
     backoff: {
@@ -19,13 +19,15 @@ const itemQueue = new Queue("item-processing", {
 
 // Job 1 — Tags generate karo
 export const addTaggingJob = async (itemId, title, description) => {
-  await itemQueue.add("generateTags", { itemId, title, description });
+ const job =  await itemQueue.add("generateTags", { itemId, title, description });
+  console.log("Tagging job added:", job.id); 
 };
 
 
 // Job 2 — Embedding generate karo
 export const addEmbeddingJob = async (itemId, title, description) => {
-  await itemQueue.add("generateEmbedding", { itemId, title, description });
+  const job =  await itemQueue.add("generateEmbedding", { itemId, title, description });
+   console.log("Embedding job added:", job.id);
 };
 
 export default itemQueue;

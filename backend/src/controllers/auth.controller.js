@@ -2,6 +2,8 @@ import asyncHandler from "../middleware/asyncHandler.js";
 import userModel from "../models/user.model.js";
 import AppError from "../utils/AppError.js";
 import jwt from "jsonwebtoken";
+import redis from "../config/redis.js"
+
 
 
 
@@ -77,7 +79,43 @@ export const loginController = asyncHandler(async (req, res) => {
 
 
 
+export const getMeController = asyncHandler(async(req,res)=>{
+
+ const userId = req.user.id;
+ const user = await userModel.findById(userId);
+ if(!user){
+  throw new AppError("User not found", 404);
+ }
+
+ return res.status(200).json({
+  success:true,
+  message:"user profile fetch sucessfully",
+  data:user
+ })
+
+})
 
 
 
 
+
+
+export const logoutController  = asyncHandler(async(req,res)=>{
+
+  const token = req.cookies?.JWT_TOKEN;
+
+  if(token){
+    
+   await redis.set(token,Date.now().toString() ,"EX" , 60*60*24)
+
+  }
+  
+  res.clearCookie("JWT_TOKEN");
+  
+  return res.status(200).json({
+    success:true,
+    message:"user logout sucessfully",
+  })
+
+
+})

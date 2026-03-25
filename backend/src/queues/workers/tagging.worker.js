@@ -1,5 +1,5 @@
 import { Worker } from "bullmq";
-import redis from "../../config/redis.js";
+import {bullMQConnection} from "../../config/redis.js";
 import { generateTags } from "../../services/ai.service.js";
 import itemModel from "../../models/item.model.js";
 
@@ -13,6 +13,8 @@ const taggingWorker = new Worker(
     const { itemId, title, description } = job.data;
     console.log(`Generating tags for item: ${itemId}`);
 
+    // console.log(`Title: ${title}, Description: ${description}`);
+
     // AI se tags lo
     const { tags, topicCluster } = await generateTags(title, description);
 
@@ -24,7 +26,7 @@ const taggingWorker = new Worker(
 
     console.log(`Tags done for item: ${itemId}`, tags);
   },
-  { connection: redis }
+  { connection: bullMQConnection }
 );
 
 // Error handling

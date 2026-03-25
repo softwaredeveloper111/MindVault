@@ -5,7 +5,7 @@ import  "./src/config/redis.js";
 
 
 import "./src/queues/workers/embedding.worker.js";
-import "./src/queues/workers/tagging.wroker.js";
+import "./src/queues/workers/tagging.worker.js";
 
 
 const PORT = process.env.PORT || 7000

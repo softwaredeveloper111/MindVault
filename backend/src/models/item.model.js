@@ -17,7 +17,7 @@ const itemSchema = new mongoose.Schema({
 
   sourceType: {
     type: String,
-    enum: ["article", "tweet", "youtube", "pdf", "image", "note"],
+    enum: ["article", "tweet", "youtube", "pdf", "image", "note", "instagram", "linkedin", "other"],
     required: [true, "source must be defined"],
   },
 
