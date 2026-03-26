@@ -6,6 +6,7 @@ import authRouter from "./routes/auth.route.js";
 import itemRouter from "./routes/item.route.js";
 import searchRouter from "./routes/search.route.js";
 import graphRouter from "./routes/graph.route.js";
+import collectionRouter from "./routes/collection.route.js"
 import cookieParser from "cookie-parser";
 
 
@@ -36,7 +37,7 @@ app.use("/api/auth", authRouter )
 app.use("/api/items", itemRouter)
 app.use("/api/search" ,searchRouter)
 app.use("/api/graph" ,  graphRouter)
-
+app.use("/api/collections", collectionRouter )
 
 
 
