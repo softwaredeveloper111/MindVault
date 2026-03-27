@@ -22,11 +22,33 @@ export const createItem = async(userId,data)=>{
   if(sourceType !== "note" && url){
 
     const {title, description, thumbnailUrl, extractedText} = await scrapeUrl(url);
-    newItem.title = title;
-    newItem.description = description;
-    newItem.thumbnailUrl = thumbnailUrl;
-    newItem.extractedText = extractedText;
+
+   
+      let fallbackTitle = "";
+    try {
+      const parsed = new URL(url);
+      const pathParts = parsed.pathname
+        .split("/")
+        .filter(Boolean)
+        .at(-1)
+        ?.replace(/[-_]/g, " ")
+        ?? "";
+      fallbackTitle = [parsed.hostname.replace("www.", ""), pathParts]
+        .filter(Boolean)
+        .join(" ");
+    } catch (_) {
+      fallbackTitle = url;
+    }
+
+
+
+    
+    newItem.title        = title        || fallbackTitle;
+    newItem.description  = description  || userNote || "";
+    newItem.thumbnailUrl  = thumbnailUrl  || "";
+    newItem.extractedText = extractedText || "";
     await newItem.save();
+
   };
 
  

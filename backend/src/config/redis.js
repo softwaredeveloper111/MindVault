@@ -4,7 +4,7 @@ import Redis from "ioredis";
 
 const redis = new Redis({
   host:process.env.REDIS_HOST,
-  port:process.env.REDIS_PORT,
+  port:Number(process.env.REDIS_PORT),
   password:process.env.REDIS_PASSWORD,
   maxRetriesPerRequest: null, 
 })
@@ -12,7 +12,7 @@ const redis = new Redis({
 
 export const bullMQConnection = {
   host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT,
+  port: Number(process.env.REDIS_PORT),
   password: process.env.REDIS_PASSWORD,
    maxRetriesPerRequest: null, 
 };

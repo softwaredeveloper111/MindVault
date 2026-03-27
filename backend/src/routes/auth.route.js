@@ -1,11 +1,15 @@
 import { Router } from "express";
 import { registerController ,loginController , getMeController , logoutController} from "../controllers/auth.controller.js"
 import identifyingUser from "../middleware/auth.middleware.js";
+import {registerValidation , loginValidation} from "../validators/auth.validator.js"
+
 
 
 
 
 const authRouter = Router();
+
+
 
 
 
@@ -17,7 +21,12 @@ const authRouter = Router();
  * @description   Register new user
  */
 
-authRouter.post("/register", registerController)
+authRouter.post("/register", registerValidation , registerController)
+
+
+
+
+
 
 
 
@@ -29,7 +38,10 @@ authRouter.post("/register", registerController)
  * @description   Login user and get JWT token
  */
 
-authRouter.post("/login", loginController)
+authRouter.post("/login", loginValidation , loginController)
+
+
+
 
 
 
@@ -52,14 +64,22 @@ authRouter.get("/me", identifyingUser , getMeController)
 
 
 
+
+
+
 /**
  * @method  POST
  * @route   /api/auth/logout
  * @description
  * 
  */
-
 authRouter.post("/logout", logoutController )
+
+
+
+
+
+
 
 
 

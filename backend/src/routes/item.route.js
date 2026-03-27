@@ -9,6 +9,8 @@ import { saveItemController ,
      addHighlightController
      } 
 from "../controllers/item.controller.js";
+import {saveItemValidation} from "../validators/item.validator.js"
+
 
 
 
@@ -24,17 +26,23 @@ const itemRouter = Router();
  * @method    POST
  * @route     /api/items
  * @description     save a new item
+ * @body       {url,sourceType,userNote(optional)}
  */
-itemRouter.post("/" , identifyingUser ,  saveItemController )
+itemRouter.post("/" , saveItemValidation , identifyingUser ,  saveItemController )
+
+
 
 
 
 /**
  * @method    GET
  * @route    /api/items
- * @description    fetch all the items
+ * @description    fetch all the saved items of the user
  */
 itemRouter.get("/", identifyingUser , fetchItemController )
+
+
+
 
 
 
@@ -45,6 +53,7 @@ itemRouter.get("/", identifyingUser , fetchItemController )
  */
 
 itemRouter.get("/resurfaced" , identifyingUser ,resurfacedController)
+
 
 
 

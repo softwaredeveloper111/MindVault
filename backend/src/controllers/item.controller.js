@@ -71,7 +71,7 @@ export const getSingleItemController = asyncHandler(async(req,res)=>{
   const itemId = req.params.id;
 
    
-  const item =await getItemById(itemId,userId);
+  const item = await getItemById(itemId,userId);
   if(!item){
     throw new AppError("item not found" , 404)
   }

@@ -28,7 +28,7 @@ export const scrapeUrl = async (url) => {
     const title =
       getMeta("og:title") ||
       $("title").text().trim() ||
-      "Untitled";
+      "";
 
     const description =
       getMeta("og:description") ||
