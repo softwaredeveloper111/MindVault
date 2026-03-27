@@ -27,7 +27,10 @@ const collectionSchema = new mongoose.Schema({
 
   color:{
     type:String,
-    enum: ["red","blue","green","yellow","purple"],
+    enum: {
+     values: ["red","blue","green","yellow","purple"],
+      message: "Invalid color. Allowed values: red, blue, green, yellow, purple"
+      },
     default:"blue"
   },
   

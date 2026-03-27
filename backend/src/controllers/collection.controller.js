@@ -76,7 +76,7 @@ export const updateCollectionController = asyncHandler( async(req,res)=>{
 const userId = req.user.id;
 const collectionId = req.params.id;
 
-const updatedFolder = await collectionModel.findOneAndUpdate({userId , _id:collectionId}, req.body ,{new:true});
+const updatedFolder = await collectionModel.findOneAndUpdate({userId , _id:collectionId}, req.body ,{new:true ,runValidators: true});
 if(!updatedFolder){
   throw new AppError("collection not found" , 404)
 }
@@ -129,6 +129,9 @@ export const pushItemsinCollectionController = asyncHandler(async(req,res) =>{
 
   const itemId = req.body.itemId;
 
+  const item = await itemModel.findOne({ _id: itemId, userId }); 
+  if (!item) throw new AppError("Item not found or does not belong to you", 404);
+
   const collection = await collectionModel.findOneAndUpdate(
     {_id:collectionId,
       userId,
@@ -168,6 +171,8 @@ export const pullItemCollectionController = asyncHandler(async(req,res) => {
   const itemId = req.params.itemId;
 
 
+
+
   const updateCollection = await collectionModel.findOneAndUpdate(
     {_id:collectionId,
       userId,
@@ -180,7 +185,7 @@ export const pullItemCollectionController = asyncHandler(async(req,res) => {
   );
 
   if(!updateCollection){
-    throw new AppError("collection not found or items does not belongs to the user", 404)
+    throw new AppError("Collection not found or item is not in this collection", 404)
   }
 
   await itemModel.findByIdAndUpdate(itemId, {

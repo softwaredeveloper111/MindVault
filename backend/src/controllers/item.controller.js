@@ -146,17 +146,10 @@ const userId = req.user.id;
 const itemId = req.params.id;
 const {text,color} = req.body;
 
- const isItemExists = await itemModel.findById(itemId);
+ const isItemExists = await itemModel.findOne({_id:itemId,userId});
   if(!isItemExists){
     throw new AppError("item not found", 404)
   } 
-
-
-  const isOwnerOfItem = isItemExists.userId.toString() === userId.toString();
-  if(!isOwnerOfItem){
-    throw new AppError("you are not owner of this item", 401)
-  }
-
 
 
   const highlight = await highlightModel.create({itemId,userId,text,color});
