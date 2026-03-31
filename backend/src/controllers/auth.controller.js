@@ -51,7 +51,7 @@ export const loginController = asyncHandler(async (req, res) => {
   
 
   if(!isUserRegistered){
-    throw new AppError("User not registered", 404);
+    throw new AppError("User not found", 404);
   }
 
   

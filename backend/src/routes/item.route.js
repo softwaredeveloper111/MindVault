@@ -25,7 +25,7 @@ const itemRouter = Router();
 /**
  * @method    POST
  * @route     /api/items
- * @description     save a new item
+ * @description     save or create  a new item
  * @body       {url,sourceType,userNote(optional)}
  */
 itemRouter.post("/" , saveItemValidation , identifyingUser ,  saveItemController )
