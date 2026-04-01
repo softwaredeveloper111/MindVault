@@ -7,60 +7,74 @@ import { addTaggingJob, addEmbeddingJob } from "../queues/item.queue.js";
 
 
 /** create item */
-export const createItem = async(userId,data)=>{
-
-  const {url, sourceType , userNote, collectionIds} = data;
-  const newItem= await itemModel.create({
-     userId,
-     url,
-     sourceType,
-     userNote,
-     collectionIds: collectionIds || [],
-     status: "processing",
+export const createItem = async(userId, data) => {
+ 
+  const { url, sourceType, userNote, collectionIds } = data;
+ 
+  const newItem = await itemModel.create({
+    userId,
+    url,
+    sourceType,
+    userNote,
+    collectionIds: collectionIds || [],
+    status: "processing",
   });
-  
-  if(sourceType !== "note" && url){
-
-    const {title, description, thumbnailUrl, extractedText} = await scrapeUrl(url);
-
-   
-      let fallbackTitle = "";
+ 
+  // --- Step 1: Title & Description resolve karo ---
+  let title = "";
+  let description = "";
+  let thumbnailUrl = "";
+  let extractedText = "";
+ 
+  if (sourceType !== "note" && url) {
+    const scraped = await scrapeUrl(url);
+    title        = scraped.title        || "";
+    description  = scraped.description  || "";
+    thumbnailUrl = scraped.thumbnailUrl  || "";
+    extractedText = scraped.extractedText || "";
+  }
+ 
+  // Fallback: agar scraping se title nahi mila
+  if (!title) {
     try {
       const parsed = new URL(url);
-      const pathParts = parsed.pathname
+      const pathPart = parsed.pathname
         .split("/")
         .filter(Boolean)
         .at(-1)
-        ?.replace(/[-_]/g, " ")
-        ?? "";
-      fallbackTitle = [parsed.hostname.replace("www.", ""), pathParts]
+        ?.replace(/[-_]/g, " ") ?? "";
+      title = [parsed.hostname.replace("www.", ""), pathPart]
         .filter(Boolean)
         .join(" ");
     } catch (_) {
-      fallbackTitle = url;
+      title = url || "Untitled";
     }
-
-
-
-    
-    newItem.title        = title        || fallbackTitle;
-    newItem.description  = description  || userNote || "";
-    newItem.thumbnailUrl  = thumbnailUrl  || "";
-    newItem.extractedText = extractedText || "";
-    await newItem.save();
-
-  };
-
+  }
  
-
-  await addTaggingJob(newItem._id.toString(), newItem.title, newItem.description);
-  await addEmbeddingJob(newItem._id.toString(), newItem.title, newItem.description);
-
-
+  // Fallback: agar description bhi nahi mila
+  if (!description) {
+    description = userNote || "";
+  }
+ 
+  // --- Step 2: DB update karo pehle, phir jobs add karo ---
+  newItem.title         = title;
+  newItem.description   = description;
+  newItem.thumbnailUrl  = thumbnailUrl;
+  newItem.extractedText = extractedText;
+  await newItem.save();
+ 
+  // --- Step 3: Jobs add karo saved title/description ke saath ---
+  // (in-memory object se nahi, confirmed values se pass karo)
+  // Agar dono fail bhi hoon toh retry hoga (BullMQ attempts: 3)
+  const taggingText  = `${title} ${description}`.trim() || url || "content";
+  const embeddingText = `${title} ${description}`.trim() || url || "content";
+ 
+  await addTaggingJob(newItem._id.toString(), title, description || taggingText);
+  await addEmbeddingJob(newItem._id.toString(), title, description || embeddingText);
+ 
   return newItem;
-
-}
-
+};
+ 
 
 
 

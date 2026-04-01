@@ -59,34 +59,44 @@
 
 
 
-
 import { Worker } from "bullmq";
 import { bullMQConnection } from "../../config/redis.js";
 import { generateTags } from "../../services/ai.service.js";
 import itemModel from "../../models/item.model.js";
 
 const taggingWorker = new Worker(
-  "tagging-queue",   // Apni dedicated queue
+  "tagging-queue",
   async (job) => {
     const { itemId, title, description } = job.data;
     console.log(`Generating tags for item: ${itemId}`);
 
-    const { tags, topicCluster } = await generateTags(title, description);
+    // Fallback text agar dono empty hoon
+    const safeTitle = title?.trim() || "untitled content";
+    const safeDescription = description?.trim() || safeTitle;
+
+    const { tags, topicCluster } = await generateTags(safeTitle, safeDescription);
+
+    // Tags array kabhi bhi empty nahi rehna chahiye
+    const finalTags = tags?.length > 0 ? tags : ["untagged"];
+    const finalCluster = topicCluster || "Other";
 
     await itemModel.findByIdAndUpdate(itemId, {
-      tags,
-      topicCluster,
+      tags: finalTags,
+      topicCluster: finalCluster,
       status: "ready",
     });
 
-    console.log(`Tags done for item: ${itemId}`, tags);
+    console.log(`Tags done for item: ${itemId}`, finalTags);
   },
   { connection: bullMQConnection }
 );
 
 taggingWorker.on("failed", async (job, error) => {
   console.error(`Tagging failed for item ${job.data.itemId}:`, error.message);
-  await itemModel.findByIdAndUpdate(job.data.itemId, { status: "failed" });
+  // Sirf tab "failed" mark karo jab saare attempts exhaust ho jayein
+  if (job.attemptsMade >= job.opts.attempts) {
+    await itemModel.findByIdAndUpdate(job.data.itemId, { status: "failed" });
+  }
 });
 
 export default taggingWorker;

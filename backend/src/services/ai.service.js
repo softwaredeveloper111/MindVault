@@ -29,7 +29,8 @@ export const generateTags = async (title, description) => {
 
   } catch (error) {
     console.error("generateTags failed:", error.message);
-    return { tags: [], topicCluster: "Other" };  // fail hone pe empty return, crash nahi
+    // Worker ko pata chale — throw karo taaki BullMQ retry kare
+    throw new Error(`generateTags failed: ${error.message}`);
   }
 };
 
@@ -42,19 +43,17 @@ export const generateEmbedding = async (text) => {
       inputs: [text],
     });
 
-    return response.data[0].embedding;
+    const embedding = response.data[0].embedding;
+
+    if (!embedding || embedding.length === 0) {
+      throw new Error("Mistral returned empty embedding");
+    }
+
+    return embedding;
 
   } catch (error) {
     console.error("generateEmbedding failed:", error.message);
-    return [];
+    // Worker ko pata chale — throw karo taaki BullMQ retry kare
+    throw new Error(`generateEmbedding failed: ${error.message}`);
   }
 };
-
-
-
-
-/** when worker call 
- const text = `${item.title} ${item.description}`;
- generateEmbedding(text);
-
-*/
