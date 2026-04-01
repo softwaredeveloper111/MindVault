@@ -67,7 +67,7 @@ export const loginController = asyncHandler(async (req, res) => {
   res.cookie("JWT_TOKEN", token )
 
   res.status(200).json({
-    sucess:true,
+    success:true,
     message:"user loggedin sucessfully",
     data:isUserRegistered
   })
